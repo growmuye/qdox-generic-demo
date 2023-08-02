@@ -17,6 +17,7 @@ public class Example {
         //run on jdk1.8
         String projectPath = "/Users/gmy/Documents/openProjects";
 
+        System.out.println("------parse source↓↓↓↓-------");
         // read .java
         JavaProjectBuilder sourceBuiler = new JavaProjectBuilder();
         sourceBuiler.addSource(new File(projectPath + "/qdox-generic-demo/src/main/java/demo/dto/SourceDto.java"));
@@ -27,9 +28,8 @@ public class Example {
                     "sourceDto." + field.getName() + " getGenericValue >> " + field.getType().getGenericValue());
         }
 
-        System.out.println("-------------------");
-
-        // but read class Missing generic information
+        System.out.println("------parse bytecode↓↓↓↓-------");
+        // but parse class Missing generic information
         JavaProjectBuilder classBuilder = new JavaProjectBuilder(
                 new OrderedClassLibraryBuilder().appendClassLoader(ClassLoader.getSystemClassLoader()));
         URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { new File(projectPath + "/qdox-generic-demo/target/").toURL() },
@@ -42,11 +42,5 @@ public class Example {
             System.out.println(
                     "classDto." + field.getName() + " getGenericValue >> " + field.getType().getGenericValue());
         }
-
-        System.out.println("-------------------");
-
-        // the Class object in Java contains this information.
-        Class<?> aClass = urlClassLoader.loadClass("demo.dto.SourceDto");
-        //.....
     }
 }
