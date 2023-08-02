@@ -1,23 +1,25 @@
-# qdox parses bytecode without generic information
-Hello, I encountered an issue while using qdox. When qdox parses bytecode, the returned JavaClass does not contain generic information
+package demo;
 
-### maven
-```
-   <dependency>
-      <groupId>com.thoughtworks.qdox</groupId>
-      <artifactId>qdox</artifactId>
-      <version>2.0.0</version>
-    </dependency>
-```
-### Reproducible Code
-```
-public static void main(String[] args) throws IOException, ClassNotFoundException {
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.net.URL;
+import java.net.URLClassLoader;
+
+import com.thoughtworks.qdox.JavaProjectBuilder;
+import com.thoughtworks.qdox.library.OrderedClassLibraryBuilder;
+import com.thoughtworks.qdox.model.JavaClass;
+import com.thoughtworks.qdox.model.JavaField;
+
+public class Example {
+
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
         //run on jdk1.8
-        String projectPath = "project path here";
+        String projectPath = "/Users/gmy/Documents/openProjects";
 
         // read .java
         JavaProjectBuilder sourceBuiler = new JavaProjectBuilder();
-        sourceBuiler.addSource(new File(projectPath + "/qdox-gereric-demo/src/main/java/demo/dto/SourceDto.java"));
+        sourceBuiler.addSource(new File(projectPath + "/qdox-generic-demo/src/main/java/demo/dto/SourceDto.java"));
         JavaClass sourceDto = sourceBuiler.getClassByName("demo.dto.SourceDto");
         System.out.println("sourceDto getTypeParameters >> " + sourceDto.getTypeParameters());
         for (JavaField field : sourceDto.getFields()) {
@@ -30,7 +32,7 @@ public static void main(String[] args) throws IOException, ClassNotFoundExceptio
         // but read class Missing generic information
         JavaProjectBuilder classBuilder = new JavaProjectBuilder(
                 new OrderedClassLibraryBuilder().appendClassLoader(ClassLoader.getSystemClassLoader()));
-        URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { new File(projectPath + "/qdox-gereric-demo/target/").toURL() },
+        URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { new File(projectPath + "/qdox-generic-demo/target/").toURL() },
                 ClassLoader.getSystemClassLoader());
         classBuilder.addClassLoader(urlClassLoader);
         JavaClass classDto = classBuilder.getClassByName("demo.dto.SourceDto");
@@ -47,26 +49,4 @@ public static void main(String[] args) throws IOException, ClassNotFoundExceptio
         Class<?> aClass = urlClassLoader.loadClass("demo.dto.SourceDto");
         //.....
     }
-```
-
-### Printed Output
-
-```
-sourceDto getTypeParameters >> [T]
-sourceDto.data getGenericValue >> T
-sourceDto.datas getGenericValue >> List<T>
-sourceDto.actualDatas getGenericValue >> List<String>
--------------------
-classDto getTypeParameters >> []
-classDto.data getGenericValue >> java.lang.Object
-classDto.datas getGenericValue >> java.util.List
-classDto.actualDatas getGenericValue >> java.util.List
--------------------
-```
-
-The printed output above does not include generic information T for classDto；
-
-### How can I retrieve the generic information from the bytecode?
-This is my demo project. https://github.com/growmuye/qdox-generic-demo.git
-
-Please refer to the code above in demo.Example.
+}
